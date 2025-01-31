@@ -133,29 +133,4 @@ module.exports = {
 
 
 
-<div className="chart">
-  <LineChart width={600} height={300}>
-    <CartesianGrid strokeDasharray="3 3" />
-    <XAxis dataKey="year" />
-    <YAxis />
-    <Tooltip />
-    <Legend />
-    
-    {results.map((result, index) => {
-      // Assuming historical averages are directly provided in the result
-      const historicalData = result.historicalData;
-
-      return (
-        <Line
-          key={`historical-average-${result.ticker}`}
-          type="monotone"
-          data={historicalData}
-          dataKey="averageReturn"
-          stroke={index === 0 ? "#2563eb" : "#7c3aed"}
-          name={`${result.ticker} Historical Average Return`}
-        />
-      );
-    })}
-  </LineChart>
-</div>
 
