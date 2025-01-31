@@ -208,16 +208,24 @@ const Calculator = () => {
             </table>
           </div>
           <div className="chart">
-            <LineChart width={600} height={300}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="year" />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              
-              {results.map((result, index) => {
-                // Assuming historical averages are directly provided in the result
-                const historicalData = result.historicalData;
+          <LineChart width={600} height={300}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis 
+              dataKey="year" 
+              type="category" 
+              allowDuplicatedCategory={false} // Prevents duplicate years
+            />
+            <YAxis domain={[-1, 1]} />
+            <Tooltip />
+            <Legend />
+
+            {results.length > 0 && (
+              results.map((result, index) => {
+                // Extract historical data and ensure it's structured properly
+                const historicalData = result.historicalData.map(entry => ({
+                  year: entry.year,
+                  averageReturn: entry.averageReturn
+                }));
 
                 return (
                   <Line
@@ -226,11 +234,12 @@ const Calculator = () => {
                     data={historicalData}
                     dataKey="averageReturn"
                     stroke={index === 0 ? "#2563eb" : "#7c3aed"}
-                    name={`${result.ticker} Historical Average Return`}
+                    name={'S&P 500 Historical Average Return'}
                   />
                 );
-              })}
-            </LineChart>
+              })
+            )}
+          </LineChart>
           </div>
         </div>
       )}
