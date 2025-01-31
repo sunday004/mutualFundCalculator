@@ -2,12 +2,20 @@ import React, { useState, useEffect } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 import { getMutualFunds, calculateFutureValue } from '../services/api';
 import MutualFundDropdown from '../components/MutualFundDropdown';
+import GoldmanSachsLogo from '../styling/assets/Goldman_Sachs.svg.png';
 
 const Calculator = () => {
-  const [funds, setFunds] = useState([]);
-  const [selectedFunds, setSelectedFunds] = useState([]);
+    const [funds, setFunds] = useState([]);
+  const [selectedFunds, setSelectedFunds] = useState([
+    { id: 1, name: 'Fund 1', ticker: '', initialInvestment: '', timeHorizon: '', monthlyInvestment: '' },
+  ]);
   const [results, setResults] = useState([]);
 
+  const formatNumber = (value) => {
+    if (!value) return "";
+    return Number(value).toLocaleString();
+  };
+  
   useEffect(() => {
     // Fetch available mutual funds
     const fetchFunds = async () => {
@@ -18,25 +26,41 @@ const Calculator = () => {
   }, []);
 
   const handleAddFund = () => {
-    //code to add an extra fund
+    // Add a new fund if there are less than 2 funds
     if (selectedFunds.length < 2) {
+      const newId = selectedFunds.length + 1; // Assign new ID
       setSelectedFunds([
         ...selectedFunds,
-        { id: selectedFunds.length + 1, ticker: '', initialInvestment: 10000, timeHorizon: 10, monthlyInvestment: 0 },
+        { 
+          id: newId, 
+          name: `Fund ${newId}`,  // Make sure we add the correct name for the fund
+          ticker: '', 
+          initialInvestment: '', 
+          timeHorizon: '', 
+          monthlyInvestment: '' 
+        },
       ]);
     }
   };
-
+  
   const handleRemoveFund = (id) => {
-    setSelectedFunds(selectedFunds.filter(fund => fund.id !== id));
+    const updatedFunds = selectedFunds.filter(fund => fund.id !== id);
+    setSelectedFunds(updatedFunds);
     setResults(results.filter(result => result.id !== id));
+  
+    // Check if there's only one fund left, and rename it to "Fund 1"
+    if (updatedFunds.length === 1) {
+      updatedFunds[0].name = "Fund 1"; // Automatically rename the last remaining fund
+      setSelectedFunds(updatedFunds); // Update the funds state
+    }
   };
-
+  
   const updateFund = (id, field, value) => {
     setSelectedFunds(selectedFunds.map(fund =>
       fund.id === id ? { ...fund, [field]: value } : fund
     ));
   };
+  
 
   const handleCalculate = async () => {
     try {
@@ -49,47 +73,48 @@ const Calculator = () => {
 
   return (
     <div className="calculator container">
-      <h1>Mutual Fund Calculator</h1>
-
+      <div className="logo-container">
+        <img src={GoldmanSachsLogo} alt='goldman sachs logo' className='goldman-logo'/>
+      </div>
+      <h1>mutual fund calculator.</h1>
       {selectedFunds.map((fund) => (
         <div key={fund.id} className="calculator-form">
-          <h3>Fund {fund.id}</h3>
+          <h3>{fund.name}</h3>
           <div className="form-grid">
-            <div className="form-group">
+            <div className="form-group wide">
               <label>Select a Mutual Fund</label>
-              <MutualFundDropdown
+              <MutualFundDropdown 
                 funds={funds}
                 selectedFund={fund.ticker}
                 onChange={(ticker) => updateFund(fund.id, 'ticker', ticker)}
               />
             </div>
 
-            <div className="form-group">
+            <div className="form-group narrow">
               <label>Initial Investment Amount ($)</label>
               <input
-                type="number"
-                value={fund.initialInvestment}
-                onChange={(e) => updateFund(fund.id, 'initialInvestment', Number(e.target.value))}
+                className='small-input'
+                type="text"
+                value={fund.initialInvestment ? formatNumber(fund.initialInvestment) : ""}
+                onChange={(e) => {
+                  const rawValue = e.target.value.replace(/[^0-9]/g, '');
+                  updateFund(fund.id, 'initialInvestment', rawValue);
+                }}
+                placeholder="e.g., 10000"
               />
             </div>
 
-            <div className="form-group">
+            <div className="form-group narrow">
               <label>Time Horizon (Years)</label>
               <input
-                type="number"
+                className='small-input'
+                type="text"
                 value={fund.timeHorizon}
-                onChange={(e) => updateFund(fund.id, 'timeHorizon', Number(e.target.value))}
+                onChange={(e) => updateFund(fund.id, 'timeHorizon', e.target.value.replace(/[^0-9]/g, ''))}
+                placeholder='e.g., 5'
               />
             </div>
 
-            <div className="form-group">
-              <label>Monthly Investment ($)</label>
-              <input
-                type="number"
-                value={fund.monthlyInvestment}
-                onChange={(e) => updateFund(fund.id, 'monthlyInvestment', Number(e.target.value))}
-              />
-            </div>
           </div>
 
           {selectedFunds.length > 1 && (
@@ -131,7 +156,7 @@ const Calculator = () => {
                 <tr>
                   <td>Initial Investment ($)</td>
                   {results.map((result) => (
-                    <td key={`initial-${result.ticker}`}>${result.initialInvestment}</td>
+                    <td key={`initial-${result.ticker}`}>${formatNumber(result.initialInvestment)}</td>
                   ))}
                 </tr>
                 <tr>
@@ -143,7 +168,7 @@ const Calculator = () => {
                 <tr>
                   <td>Return Rate (%)</td>
                   {results.map((result) => (
-                    <td key={`return-${result.ticker}`}>{result.marketReturn * 100}%</td>
+                    <td key={`return-${result.ticker}`}>{parseFloat(result.marketReturn * 100).toFixed(2)}%</td>
                   ))}
                 </tr>
                 <tr>
@@ -162,7 +187,7 @@ const Calculator = () => {
                   <td>Earnings ($)</td>
                   {results.map((result) => (
                     <td key={`earnings-${result.ticker}`} className="earnings">
-                      ${Math.round(result.futureValue)}
+                      ${formatNumber(Math.round(result.futureValue))}
                     </td>
                   ))}
                 </tr>
@@ -170,7 +195,7 @@ const Calculator = () => {
                   <td>Total Balance ($)</td>
                   {results.map((result) => (
                     <td key={`total-${result.ticker}`}>
-                      ${Math.round(result.futureValue) + result.initialInvestment}
+                      ${formatNumber(Math.round(result.futureValue) + Number(result.initialInvestment))}
                     </td>
                   ))}
                 </tr>

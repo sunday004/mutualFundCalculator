@@ -1,10 +1,16 @@
 /* General Styles */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
 body {
-  font-family: 'Inter', sans-serif;
+  font-family: 'Poppins', sans-serif;
   line-height: 1.6;
   margin: 0;
   padding: 0;
-  background-color: #f5f7fa;
+  background: 
+        radial-gradient(circle, rgba(135, 166, 192, 0.2) 2px, transparent 2px), /* This creates the grid pattern */
+        linear-gradient(to bottom right, #FFFFFF, #D0E1F2); /* Gradient */
+  background-size: 25px 25px; /* Controls the spacing of the grid squares */
+  background-repeat: repeat, no-repeat;
   color: #333;
 }
 
@@ -23,6 +29,11 @@ p {
   padding: 20px;
 }
 
+.goldman-logo {
+  width: 80px; /* Adjust as needed */
+  height: auto;
+}
+
 /* Buttons */
 button {
   font-size: 1rem;
@@ -32,6 +43,8 @@ button {
   border-radius: 6px;
   cursor: pointer;
   transition: background 0.3s ease, transform 0.2s ease;
+  font-family: 'Poppins', sans-serif;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
 }
 
 button:hover {
@@ -39,21 +52,22 @@ button:hover {
 }
 
 .calculate-btn {
-  background: linear-gradient(90deg, #2563eb, #1e3a8a);
+  background-color: #30424e;
   color: white;
+  
 }
 
 .calculate-btn:hover {
-  background: linear-gradient(90deg, #1e3a8a, #2563eb);
+  background-color: #749ac7;
 }
 
 .add-btn {
-  background-color: #16a34a;
+  background-color: #749ac7;
   color: white;
 }
 
 .add-btn:hover {
-  background-color: #15803d;
+  background-color: #30424e;
 }
 
 .remove-btn {
@@ -65,20 +79,31 @@ button:hover {
   background-color: #b91c1c;
 }
 
+.button-group {
+  display: flex;
+  gap: 3%;
+}
+
 /* Form Styles */
+
+
 .calculator {
   max-width: 1000px;
   margin: auto;
   padding: 20px;
+  padding-left: 50px;
   background: white;
   border-radius: 10px;
   box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
 }
 
+.calculator-form {
+  margin-bottom: 20px;
+}
+
 .form-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 20px;
+  display: flex;
+  gap: 5%;
   margin-bottom: 20px;
 }
 
@@ -104,7 +129,7 @@ button:hover {
 
 .form-group input:focus,
 .form-group select:focus {
-  border-color: #2563eb;
+  border-color: #749ac7;
   box-shadow: 0 0 5px rgba(37, 99, 235, 0.3);
   outline: none;
 }
@@ -122,7 +147,7 @@ button:hover {
   text-align: center;
   font-size: 1.8rem;
   margin-bottom: 20px;
-  color: #1e3a8a;
+  color: black
 }
 
 /* Results Table */
@@ -144,7 +169,7 @@ button:hover {
 }
 
 .summary-table th {
-  background: #2563eb;
+  background: #749ac7;
   color: white;
   font-weight: 600;
 }
