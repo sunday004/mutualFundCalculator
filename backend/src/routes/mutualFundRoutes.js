@@ -10,4 +10,7 @@ router.get('/', mutualFundController.getMutualFunds);
 // Calculate future value
 router.post('/calculate-fv', mutualFundController.calculateFutureValue);
 
+// Get year averages
+// router.get('/year-averages', mutualFundController.getYearAverages);
+
 module.exports = router;

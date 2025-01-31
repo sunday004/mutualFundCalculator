@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
-import { getMutualFunds, calculateFutureValue } from '../services/api';
+import { getMutualFunds, calculateFutureValue} from '../services/api';
 import MutualFundDropdown from '../components/MutualFundDropdown';
 import GoldmanSachsLogo from '../styling/assets/Goldman_Sachs.svg.png';
+
 
 const Calculator = () => {
     const [funds, setFunds] = useState([]);
@@ -65,12 +66,15 @@ const Calculator = () => {
   const handleCalculate = async () => {
     try {
       const response = await calculateFutureValue({ funds: selectedFunds });
+      // const historicalData = response.map(result => result.historicalData);
+      // console.log(historicalData);
       setResults(response);
     } catch (error) {
       console.error("Error calculating future value:", error);
     }
   };
 
+  
   return (
     <div className="calculator container">
       <div className="logo-container">
@@ -80,6 +84,7 @@ const Calculator = () => {
       {selectedFunds.map((fund) => (
         <div key={fund.id} className="calculator-form">
           <h3>{fund.name}</h3>
+          {/* <h1> {historicalData}</h1> */}
           <div className="form-grid">
             <div className="form-group wide">
               <label>Select a Mutual Fund</label>
@@ -202,7 +207,6 @@ const Calculator = () => {
               </tbody>
             </table>
           </div>
-
           <div className="chart">
             <LineChart width={600} height={300}>
               <CartesianGrid strokeDasharray="3 3" />
@@ -210,12 +214,22 @@ const Calculator = () => {
               <YAxis />
               <Tooltip />
               <Legend />
-              {results.map((result, index) => (
-                <>
-                  <Line key={`balance-${result.ticker}`} type="monotone" dataKey="balance" stroke={index === 0 ? "#2563eb" : "#7c3aed"} name={`${result.ticker} Balance`} />
-                  <Line key={`earnings-${result.ticker}`} type="monotone" dataKey="earnings" stroke={index === 0 ? "#16a34a" : "#db2777"} name={`${result.ticker} Earnings`} />
-                </>
-              ))}
+              
+              {results.map((result, index) => {
+                // Assuming historical averages are directly provided in the result
+                const historicalData = result.historicalData;
+
+                return (
+                  <Line
+                    key={`historical-average-${result.ticker}`}
+                    type="monotone"
+                    data={historicalData}
+                    dataKey="averageReturn"
+                    stroke={index === 0 ? "#2563eb" : "#7c3aed"}
+                    name={`${result.ticker} Historical Average Return`}
+                  />
+                );
+              })}
             </LineChart>
           </div>
         </div>

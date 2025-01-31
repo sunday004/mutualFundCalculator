@@ -1,4 +1,4 @@
-const { getBetaValue, marketReturnRate } = require('../services/mutualFundService');
+const { getBetaValue, marketReturnRate, yearlyAverage} = require('../services/mutualFundService');
 //const getBetaValue = require('../services/mutualFundService');
 //const services = require('../services/mutualFundService');
 
@@ -24,35 +24,6 @@ exports.getMutualFunds = (req, res) => {
     res.json(fundList);
 };
 
-// Calculate future value
-/* exports.calculateFutureValue = async (req, res) => {
-    const { ticker, initialInvestment, timeHorizon } = req.body;
-
-    if (!ticker || !initialInvestment || !timeHorizon) {
-        return res.status(400).json({ error: 'Missing required fields: ticker, initialInvestment, timeHorizon' });
-    }
-
-    if (!mutualFunds[ticker]) {
-        return res.status(400).json({ error: `Mutual fund with ticker ${ticker} not found.` });
-    }
-
-    //const beta = mutualFunds[ticker][1];
-    const beta = await getBetaValue(ticker)
-    console.log(beta)
-    const riskFreeRate = 0.04; // Hardcoded risk-free rate
-    const marketreturn = await marketReturnRate();
-    console.log(marketreturn)
-
-    const rate = riskFreeRate + beta * (marketreturn - riskFreeRate);
-    const futureValue = initialInvestment * Math.exp(rate * timeHorizon);
-
-    res.json({
-        ticker,
-        initialInvestment: parseFloat(initialInvestment),
-        timeHorizon: parseFloat(timeHorizon),
-        futureValue: parseFloat(futureValue.toFixed(2)),
-    });
-}; */
 
 exports.calculateFutureValue = async (req, res) => {
     console.log("Received request body:", req.body)
@@ -73,8 +44,13 @@ exports.calculateFutureValue = async (req, res) => {
             const beta = await getBetaValue(ticker);
             console.log("beta value", beta)
             const riskFreeRate = 0.04;
-            const marketReturn = (await marketReturnRate()).average_return;
+            const marketData = (await marketReturnRate());
+            console.log("marketData: ", marketData);
+            const marketReturn = marketData.average_return;
+            const historicalData = await yearlyAverage();
+
             console.log(marketReturn)
+            console.log("historical: ",historicalData);
 
             const rate = riskFreeRate + beta * (marketReturn - riskFreeRate);
             const futureValue = initialInvestment * Math.exp(rate * timeHorizon);
@@ -87,6 +63,7 @@ exports.calculateFutureValue = async (req, res) => {
                 beta,
                 marketReturn,
                 futureValue: futureValue.toFixed(2),
+                historicalData,
             };
         }));
 
@@ -95,3 +72,19 @@ exports.calculateFutureValue = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
+
+
+// exports.getYearAverages = async (req, res) => {
+//     try {
+//         const result = await marketReturnRate();
+//         console.log("Yearly Averages Result:", result.year_averages);
+        
+//         if (result.error) {
+//             return res.status(500).json({ error: result.error });
+//         }
+//         res.json(result.year_averages);
+//     } catch (error) {
+//         console.error("Error fetching year averages:", error);
+//         res.status(500).json({ error: error.message });
+//     }
+// };
